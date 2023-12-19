@@ -26,6 +26,11 @@ function findAccountById(accounts, id) {
  }
 
 
+function getAuthorById(authors, authorId) {
+  return authors.find((auth) => auth.id === authorId);
+}
+
+
  function getBooksPossessedByAccount(account, books, authors) {
   let result = [];
   let borrowMatch = [];
@@ -53,9 +58,33 @@ function findAccountById(accounts, id) {
   return result;
  }
 
+ function filterAndMapBorrows(accountId, books) {
+  return books.reduce((result, book) => {
+    const { id, title, genre, authorId, borrows } = book;
+    const borrowInfo = borrows.filter(
+      (borrow) => borrow.id === accountId && !borrow.returned
+    );
+
+    if (borrowInfo.length > 0) {
+      result.push({
+        id,
+        title,
+        genre,
+        authorId,
+        author: authors.find((auth) => auth.id === authorId),
+        borrows: borrowInfo,
+      });
+    }
+
+    return result;
+  }, []);
+}
+
  module.exports = {
   findAccountById,
   sortAccountsByLastName,
   getTotalNumberOfBorrows,
-  getBooksPossessedByAccount
+  getBooksPossessedByAccount,
+  filterAndMapBorrows,
+  getAuthorById,
  };
